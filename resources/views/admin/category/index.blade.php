@@ -1,0 +1,117 @@
+@extends('admin.layouts.master')
+@section('content')
+<div class="content-wrapper">
+  @if(Session::has('success'))
+    <div class="alert alert-dismissible fade show alert-success p-3" role="alert">
+      <p class="text-white mt-s"><i class="fas fa-check-circle"></i> {{Session::get('success')}}</p>
+      <button type="button" class="close p-3" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">×</span>
+      </button>
+    </div>
+  @endif
+    <div class="row">
+        <div class="col-lg-5">
+            <div class="card card-default">
+                <div class="card-header card-header-border-bottom">
+                    <h2>Create Category</h2>
+                </div>
+                <div class="card-body">
+                    <form action="{{route('category.store')}}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="form-row">
+                            <div class="col-md-12 mb-3">
+                                <label for="title">Title <span class="required-icon">*</span></label>
+                                <input type="text" class="form-control" autofocus name="title" id="title" placeholder="Enter category title" value="{{old('title')}}" maxlength="100" required>
+                                @error('title')
+                                <span class="text-danger" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label for="short_desc">Short Description</label>
+                                <textarea class="form-control" name="short_desc" id="short_desc" placeholder="Enter short description" maxlength="1000">{{old('short_desc')}}</textarea>
+                                @error('short_desc')
+                                <span class="text-danger" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                <label for="parent_id">Parent Category</label>
+                                <select type="text" class="form-control" id="parent_id" name="parent_id">
+                                    <option value="">Select Parent category</option>
+                                        @foreach($parent_cat as $par_cat)
+                                            <option value="{{ $par_cat->id }}">{{ $par_cat->title }}</option>
+                                        @endforeach
+                                </select>
+                                @error('parent_id')
+                                <span class="text-danger" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label for="image">Image</label>
+                                <input type="file" class="form-control-file" id="image" name="img">
+                                @error('img')
+                                <span class="text-danger" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <button class="mb-1 btn cus-btn" type="submit">Create</button>
+                        {{-- <a href="/admin/category" class="mb-1 btn btn-sm btn-secondary ml-2"> Cancel</a> --}}
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <div class="card card-default">
+                <div class="card-header card-header-border-bottom">
+                    <h2>Category List</h2>
+                </div>
+                <div class="card-body">
+                    <table id="example" class="table">
+                        <thead>
+                            <tr>
+                                <th>SL.</th>
+                                <th>Category Name</th>
+                                <th>Parent</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($category as $cat)
+                                <tr class="even">
+                                    <td>{{$no++}}</td>
+                                    <td>{{$cat->title}}</td>
+                                    <td>@if(!empty($cat)){{getCatTitle($cat->parent_id)}} @endif</td>
+                                    <td class="text-center">
+                                        @if($cat->status == 1)
+                                            <i title="Active" class="fas fa-check text-success"></i>
+                                        @else
+                                            <i title="Inactive" class="fas fa-times text-danger"></i>
+                                        @endif
+                                    </td>
+                                    <td class="table-action">
+                                        <a href="{{route('category.edit',[$cat->id])}}">
+                                            <span class="mdi mdi-pencil-box text-success h6 f-20"></span>
+                                        </a>
+                                        <a href="{{route('category.delete',[$cat->id])}}">
+                                            <span class="mdi mdi-delete text-danger h6 f-20" onClick="return confirm('Are you sure you want to Destroy this data permanently?')"></span>
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
